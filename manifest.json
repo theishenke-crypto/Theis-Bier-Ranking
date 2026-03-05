@@ -1,0 +1,37 @@
+{
+  "name": "Theis Bier Ranking",
+  "short_name": "BeerLog",
+  "description": "Persönlicher Bier-Tracker",
+  "start_url": "/Theis-Bier-Ranking/",
+  "scope": "/Theis-Bier-Ranking/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/Theis-Bier-Ranking/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Theis-Bier-Ranking/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/Theis-Bier-Ranking/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Theis-Bier-Ranking/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
