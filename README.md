@@ -1,1 +1,0 @@
-# Theis-Bier-Ranking
