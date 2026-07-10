@@ -1544,8 +1544,10 @@ function renderStats(){
     const size=8+Math.round(b.rating*1.8);
     return `<div title="${esc(b.name)}: ${b.rating}" style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0">
       <div style="font-size:8px;color:${c};font-family:'DM Mono',monospace">${b.rating.toFixed(1)}</div>
-      <div style="width:${size}px;height:${size}px;border-radius:50%;background:${c};flex-shrink:0;margin:0 auto"></div>
-      <div style="font-size:6px;color:var(--text-dim);writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;max-height:36px;overflow:hidden">${esc(b.name).slice(0,10)}</div>
+      <div style="height:28px;display:flex;align-items:flex-end;justify-content:center">
+        <div style="width:${size}px;height:${size}px;border-radius:50%;background:${c};flex-shrink:0"></div>
+      </div>
+      <div style="font-size:6px;color:var(--text-dim);writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;height:36px;overflow:hidden">${esc(b.name).slice(0,10)}</div>
     </div>`;
   }).join("");
 
@@ -1720,12 +1722,21 @@ function saveEdit(){const name=document.getElementById("edit-name").value.trim()
 function rateAgain(){
   const beer=beers.find(b=>b.id===editingId);
   if(!beer)return;
+  const name=document.getElementById("edit-name").value.trim()||beer.name;
   const r=parseFloat(document.getElementById("edit-rating").value);
   const date=document.getElementById("edit-date").value;
   const notes=(document.getElementById("edit-notes").value||"").trim().slice(0,500);
   if(isNaN(r)||r<0||r>10)return;
+  const type=currentEditType||beer.type||"flasche";
+  // Re-match by name+type (like addBeer()) instead of assuming "this beer" —
+  // if the type toggle was switched, the real duplicate may be a different entry, or none at all.
+  const dupe=beers.find(b=>b.name.toLowerCase()===name.toLowerCase()&&(b.type||"flasche")===type);
   closeModal();
-  showDupeModal(beer, beer.name, r, date, notes, beer.type||"flasche");
+  if(dupe){
+    showDupeModal(dupe, name, r, date, notes, type);
+  } else {
+    finishAddBeer(name, r, date, notes, type);
+  }
 }
 function saveFile(){
   // Embed current beers into the HTML before saving
