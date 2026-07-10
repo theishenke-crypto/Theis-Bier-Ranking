@@ -679,20 +679,20 @@ body.retro-mode.glitching .hero-title {
 <script>
 const PALETTES = {
   dark:       {'--bg':'#0a0a0a','--bg2':'#111111','--bg3':'#181818','--border':'#1e1e1e','--border2':'#2a2a2a','--gold':'#d4961e','--gold2':'#f0b84a','--gold-dim':'#7a5510','--text':'#e8e0d0','--text-dim':'#4a4030','--text-mid':'#8a7a60','--red':'#b03828','--green':'#3a7a2a'},
-  midnight:   {'--bg':'#07080f','--bg2':'#0d0f1a','--bg3':'#131525','--border':'#1a1d2e','--border2':'#22263a','--gold':'#5b8ef0','--gold2':'#82aaff','--gold-dim':'#1e3a8a','--text':'#d0d8f0','--text-dim':'#3a4870','--text-mid':'#5a6a9a','--red':'#b03828','--green':'#3a7a2a'},
+  midnight:   {'--bg':'#07080f','--bg2':'#0d0f1a','--bg3':'#131525','--border':'#1a1d2e','--border2':'#22263a','--gold':'#3d7bff','--gold2':'#6ea3ff','--gold-dim':'#1e3a8a','--text':'#d0d8f0','--text-dim':'#3a4870','--text-mid':'#5a6a9a','--red':'#b03828','--green':'#3a7a2a'},
   forest:     {'--bg':'#080f08','--bg2':'#0e160e','--bg3':'#141e14','--border':'#1a281a','--border2':'#243424','--gold':'#6abf6a','--gold2':'#8fd98f','--gold-dim':'#2d6b2d','--text':'#d4e8d4','--text-dim':'#4a6a4a','--text-mid':'#6a9a6a','--red':'#b03828','--green':'#3a7a2a'},
   ember:      {'--bg':'#0f0804','--bg2':'#180e06','--bg3':'#211408','--border':'#2a1a0a','--border2':'#3a2410','--gold':'#f06020','--gold2':'#ff8040','--gold-dim':'#7a2e08','--text':'#f0dcc8','--text-dim':'#5a3018','--text-mid':'#a06030','--red':'#b03828','--green':'#3a7a2a'},
   newspaper:  {'--bg':'#f5f0e8','--bg2':'#ede8dc','--bg3':'#e0d8c8','--border':'#d4c8b0','--border2':'#c0b090','--gold':'#1a1208','--gold2':'#3a2e18','--gold-dim':'#6a5a3a','--text':'#1a1208','--text-dim':'#8a7a5a','--text-mid':'#5a4a2a','--red':'#c43820','--green':'#2a6a2a'},
-  purple:     {'--bg':'#0a0810','--bg2':'#110e1a','--bg3':'#181525','--border':'#251e38','--border2':'#342a4e','--gold':'#c89eff','--gold2':'#e0c4ff','--gold-dim':'#6a3a9a','--text':'#ede0ff','--text-dim':'#4a3870','--text-mid':'#8a6ab0','--red':'#ff4488','--green':'#44aa88'},
+  purple:     {'--bg':'#0a0810','--bg2':'#110e1a','--bg3':'#181525','--border':'#251e38','--border2':'#342a4e','--gold':'#a855f7','--gold2':'#c084fc','--gold-dim':'#5b21b6','--text':'#ede0ff','--text-dim':'#4a3870','--text-mid':'#8a6ab0','--red':'#ff4488','--green':'#44aa88'},
   green_term: {'--bg':'#000a00','--bg2':'#001200','--bg3':'#001a00','--border':'#002800','--border2':'#003a00','--gold':'#00ff44','--gold2':'#44ff88','--gold-dim':'#006620','--text':'#00dd44','--text-dim':'#005a20','--text-mid':'#008830','--red':'#ff4400','--green':'#00aa44'},
 };
 const RATING_COLORS = {
   dark:       [['#f0b84a',8],['#d4961e',6.5],['#b06820',5],['#8a5030',3.5],['#6a4028',0]],
-  midnight:   [['#82aaff',8],['#5b8ef0',6.5],['#3a6abf',5],['#2a4a8a',3.5],['#1a2e5a',0]],
+  midnight:   [['#6ea3ff',8],['#3d7bff',6.5],['#255fe0',5],['#1a45ad',3.5],['#12275e',0]],
   forest:     [['#8fd98f',8],['#6abf6a',6.5],['#4a9a4a',5],['#2d6b2d',3.5],['#1a3a1a',0]],
   ember:      [['#ff8040',8],['#f06020',6.5],['#c04010',5],['#7a2e08',3.5],['#3a1204',0]],
   newspaper:  [['#3a2010',8],['#5a3818',6.5],['#7a5030',5],['#9a7050',3.5],['#b09070',0]],
-  purple:     [['#e0c4ff',8],['#c89eff',6.5],['#9a6aee',5],['#6a3a9a',3.5],['#3a1a6a',0]],
+  purple:     [['#c084fc',8],['#a855f7',6.5],['#9333ea',5],['#7e22ce',3.5],['#581c87',0]],
   green_term: [['#44ff88',8],['#00ff44',6.5],['#00cc33',5],['#008820',3.5],['#003a10',0]],
 };
 let currentPalette = localStorage.getItem('beerlog_palette') || 'midnight';
