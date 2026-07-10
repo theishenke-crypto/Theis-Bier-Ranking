@@ -1,4 +1,4 @@
-const CACHE = 'beerlog-v28';
+const CACHE = 'beerlog-v29';
 const ASSETS = [
   '/Theis-Bier-Ranking/',
   '/Theis-Bier-Ranking/index.html',

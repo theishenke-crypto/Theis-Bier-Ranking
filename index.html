@@ -139,6 +139,13 @@ input::placeholder { color: var(--text-dim); }
 input:focus { border-color: var(--gold-dim); }
 input[type="date"] { color: var(--text-mid); font-size: 13px; }
 #inp-search { padding-left: 32px; }
+textarea {
+  width: 100%; padding: 9px 11px; background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 7px; color: var(--text); font-size: 14px;
+  font-family: 'DM Mono', monospace; outline: none; transition: border-color 0.15s; resize: vertical;
+}
+textarea::placeholder { color: var(--text-dim); }
+textarea:focus { border-color: var(--gold-dim); }
 .filter-sort-row { display: flex; gap: 4px; flex-wrap: wrap; }
 .chip { padding: 5px 10px; background: transparent; border: 1px solid var(--border); border-radius: 20px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.03em; color: var(--text-dim); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
 .chip.active { background: var(--bg3); color: var(--gold); border-color: var(--gold-dim); }
@@ -481,6 +488,10 @@ body.retro-mode.glitching .hero-title {
       <div class="field-label">Datum</div>
       <input id="inp-date" type="date"/>
     </div>
+    <div class="field-group" id="field-notes" style="display:none">
+      <div class="field-label">Notizen</div>
+      <textarea id="inp-notes" placeholder="Geschmack, Eindrücke..." rows="3" maxlength="500"></textarea>
+    </div>
     <div class="error" id="error-msg"></div>
     <button class="btn-add-big" id="btn-add" onclick="addBeer()">+ Bier hinzufügen</button>
   </div>
@@ -517,6 +528,18 @@ body.retro-mode.glitching .hero-title {
         <span style="font-size:12px;color:var(--text)">Standort beim Eintragen</span>
         <button id="loc-toggle" onclick="toggleLocationSetting()" style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:background 0.2s;-webkit-tap-highlight-color:transparent">
           <span id="loc-toggle-knob" style="position:absolute;top:2px;width:20px;height:20px;border-radius:50%;background:white;transition:left 0.2s"></span>
+        </button>
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px">MODUS</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px">
+        <div>
+          <div style="font-size:12px;color:var(--text)">Detaillierter Modus</div>
+          <div style="font-size:9px;color:var(--text-dim);margin-top:1px">Notizen zu Bieren hinzufügen</div>
+        </div>
+        <button id="detail-toggle" onclick="toggleDetailMode()" style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:background 0.2s;-webkit-tap-highlight-color:transparent">
+          <span id="detail-toggle-knob" style="position:absolute;top:2px;width:20px;height:20px;border-radius:50%;background:white;transition:left 0.2s"></span>
         </button>
       </div>
     </div>
@@ -608,6 +631,9 @@ body.retro-mode.glitching .hero-title {
       <div class="add-row">
         <input id="edit-rating" type="number" placeholder="0–10" min="0" max="10" step="0.1" style="flex:1"/>
         <input id="edit-date" type="date" style="flex:1.2"/>
+      </div>
+      <div id="edit-field-notes" style="display:none">
+        <textarea id="edit-notes" placeholder="Geschmack, Eindrücke..." rows="3" maxlength="500"></textarea>
       </div>
     </div>
     <div class="modal-btns">
@@ -1246,6 +1272,29 @@ function updateAddLocToggle() {
   if(display) display.style.display = enabled ? '' : 'none';
 }
 
+let detailMode = localStorage.getItem('beerlog_detail_mode') === '1';
+function toggleDetailMode() {
+  detailMode = !detailMode;
+  localStorage.setItem('beerlog_detail_mode', detailMode ? '1' : '0');
+  updateDetailModeToggle();
+  applyDetailMode();
+}
+function updateDetailModeToggle() {
+  const btn = document.getElementById('detail-toggle');
+  const knob = document.getElementById('detail-toggle-knob');
+  if(!btn || !knob) return;
+  btn.style.background = detailMode ? 'var(--gold)' : 'var(--border2)';
+  knob.style.left = detailMode ? '22px' : '2px';
+}
+function applyDetailMode() {
+  const disp = detailMode ? 'flex' : 'none';
+  const f1 = document.getElementById('field-notes');
+  const f2 = document.getElementById('edit-field-notes');
+  if(f1) f1.style.display = disp;
+  if(f2) f2.style.display = disp;
+  renderList();
+}
+
 
 function updateTypeButtons() {
   const retro = document.body.classList.contains('retro-mode');
@@ -1275,6 +1324,7 @@ function renderAll() {
 function showAddSuccess() {
   document.getElementById("inp-name").value="";
   document.getElementById("inp-rating").value="";
+  const notesEl=document.getElementById("inp-notes");if(notesEl)notesEl.value="";
   const rd=document.getElementById("rating-display");
   if(rd){rd.textContent="—";rd.style.color="var(--text-dim)";}
   const btn=document.getElementById("btn-add");
@@ -1282,7 +1332,7 @@ function showAddSuccess() {
   setTimeout(()=>{btn.textContent="+ Bier hinzufügen";btn.classList.remove("added");showPage("home");},1200);
 }
 
-function openSettings() { applyPalette(currentPalette); document.getElementById('settings-modal').classList.add('open'); updateLocToggle(); }
+function openSettings() { applyPalette(currentPalette); document.getElementById('settings-modal').classList.add('open'); updateLocToggle(); updateDetailModeToggle(); }
 function closeSettings() { document.getElementById('settings-modal').classList.remove('open'); }
 const KEYS=["beerlog_v3","beerlog_v2","beer_log_v1"];
 const STORAGE_KEY="beerlog_v3";
@@ -1446,6 +1496,7 @@ function renderList(){ resetAllSwipes && resetAllSwipes();
           </div>
           <div class="beer-bar-wrap"><div class="beer-bar-track"><div class="beer-bar-fill" style="width:${beer.rating*10}%;background:${c}"></div></div></div>
           <div class="beer-date" style="color:var(--text-mid)">${fmtDate(beer.date)}</div>
+          ${(detailMode && beer.notes) ? `<div class="beer-notes" style="font-size:11px;color:var(--text-mid);margin-top:2px;white-space:pre-wrap">${esc(beer.notes)}</div>` : ''}
         </div>
         <div class="beer-right">
           <div><div class="beer-score" style="color:${c}">${beer.rating.toFixed(1)}</div><div class="beer-score-max">/10</div></div>
@@ -1572,6 +1623,7 @@ function addBeer(){
   const rRaw=document.getElementById("inp-rating").value;
   const date=document.getElementById("inp-date").value||new Date().toISOString().slice(0,10);
   const r=parseFloat(rRaw);
+  const notes=detailMode?(document.getElementById("inp-notes").value||"").trim().slice(0,500):"";
   const err=document.getElementById("error-msg");
   if(!name){err.textContent="Bitte einen Namen eingeben.";return;}
   if(isNaN(r)||r<0||r>10){err.textContent="Bewertung 0–10.";return;}
@@ -1580,13 +1632,13 @@ function addBeer(){
   // Check for duplicate (same name + same type)
   const dupe = beers.find(b => b.name.toLowerCase() === name.toLowerCase() && (b.type||'flasche') === currentType);
   if(dupe) {
-    showDupeModal(dupe, name, r, date);
+    showDupeModal(dupe, name, r, date, notes);
     return;
   }
-  finishAddBeer(name, r, date);
+  finishAddBeer(name, r, date, notes);
 }
 
-function showDupeModal(existing, name, newRating, date) {
+function showDupeModal(existing, name, newRating, date, notes) {
   const c = getColor(existing.rating);
   const cNew = getColor(newRating);
   const avg = ((existing.rating + newRating) / 2);
@@ -1611,6 +1663,7 @@ function showDupeModal(existing, name, newRating, date) {
   document.getElementById('dupe-avg').onclick = () => {
     existing.rating = Math.round(avg * 10) / 10;
     existing.date = date;
+    if(notes) existing.notes = notes;
     save(); renderAll();
     modal.classList.remove('open');
     showAddSuccess();
@@ -1618,25 +1671,28 @@ function showDupeModal(existing, name, newRating, date) {
   document.getElementById('dupe-overwrite').onclick = () => {
     existing.rating = newRating;
     existing.date = date;
+    if(notes) existing.notes = notes;
     save(); renderAll();
     modal.classList.remove('open');
     showAddSuccess();
   };
   document.getElementById('dupe-new').onclick = () => {
     modal.classList.remove('open');
-    finishAddBeer(name + ' (2)', newRating, date);
+    finishAddBeer(name + ' (2)', newRating, date, notes);
   };
   modal.classList.add('open');
 }
 
-function finishAddBeer(name, r, date) {
+function finishAddBeer(name, r, date, notes) {
   const newBeer = {id:Date.now(),name,rating:r,date,type:currentType};
+  if(notes) newBeer.notes = notes;
   const locOn = addLocOverride !== null ? addLocOverride : localStorage.getItem('loc_enabled') !== '0';
   if(currentLat !== null && locOn) { newBeer.lat = currentLat; newBeer.lng = currentLng; }
   beers.push(newBeer);
   save();renderList();renderHome();
   document.getElementById("inp-name").value="";
   document.getElementById("inp-rating").value="";
+  const notesEl=document.getElementById("inp-notes");if(notesEl)notesEl.value="";
   currentLat=null;currentLng=null;
   const ld=document.getElementById('loc-display');if(ld){ld.textContent='';}
 
@@ -1651,9 +1707,9 @@ function deleteBeer(id,silent=false){if(!silent&&!confirm("Löschen?"))return;be
 function openConfirm(id){pendingDeleteId=id;const beer=beers.find(b=>b.id===id);document.getElementById("confirm-beer-name").textContent=beer?`"${beer.name}" wirklich löschen?`:"";document.getElementById("confirm-modal").classList.add("open");}
 function closeConfirm(){document.getElementById("confirm-modal").classList.remove("open");pendingDeleteId=null;}
 function confirmDelete(){if(pendingDeleteId)deleteBeer(pendingDeleteId,true);closeConfirm();}
-function openEdit(id){const beer=beers.find(b=>b.id===id);if(!beer)return;editingId=id;document.getElementById("edit-name").value=beer.name;document.getElementById("edit-rating").value=beer.rating;document.getElementById("edit-date").value=beer.date;currentEditType=beer.type||"flasche";setEditType(currentEditType);document.getElementById("modal").classList.add("open");}
+function openEdit(id){const beer=beers.find(b=>b.id===id);if(!beer)return;editingId=id;document.getElementById("edit-name").value=beer.name;document.getElementById("edit-rating").value=beer.rating;document.getElementById("edit-date").value=beer.date;document.getElementById("edit-notes").value=beer.notes||"";currentEditType=beer.type||"flasche";setEditType(currentEditType);document.getElementById("modal").classList.add("open");}
 function closeModal(){document.getElementById("modal").classList.remove("open");editingId=null;}
-function saveEdit(){const name=document.getElementById("edit-name").value.trim();const r=parseFloat(document.getElementById("edit-rating").value);const date=document.getElementById("edit-date").value;if(!name||isNaN(r)||r<0||r>10)return;const beer=beers.find(b=>b.id===editingId);if(beer){beer.name=name;beer.rating=r;beer.date=date;beer.type=currentEditType;}save();renderList();renderHome();closeModal();}
+function saveEdit(){const name=document.getElementById("edit-name").value.trim();const r=parseFloat(document.getElementById("edit-rating").value);const date=document.getElementById("edit-date").value;const notes=(document.getElementById("edit-notes").value||"").trim().slice(0,500);if(!name||isNaN(r)||r<0||r>10)return;const beer=beers.find(b=>b.id===editingId);if(beer){beer.name=name;beer.rating=r;beer.date=date;beer.type=currentEditType;if(notes)beer.notes=notes;else delete beer.notes;}save();renderList();renderHome();closeModal();}
 function saveFile(){
   // Embed current beers into the HTML before saving
   const embedTag = document.getElementById('embedded-beers-data');
@@ -1715,7 +1771,7 @@ document.getElementById("inp-date").value=new Date().toISOString().slice(0,10);
 document.getElementById("modal").addEventListener("click",e=>{if(e.target===document.getElementById("modal"))closeModal();});
 document.getElementById("confirm-modal").addEventListener("click",e=>{if(e.target===document.getElementById("confirm-modal"))closeConfirm();});
 
-load(); applyPalette(currentPalette); renderHome(); renderList(); checkWrapped(); updateLocToggle(); updateAddLocToggle();
+load(); applyPalette(currentPalette); renderHome(); renderList(); checkWrapped(); updateLocToggle(); updateAddLocToggle(); updateDetailModeToggle(); applyDetailMode();
 
 document.getElementById("settings-modal").addEventListener("click",e=>{
   if(e.target===document.getElementById("settings-modal"))closeSettings();
