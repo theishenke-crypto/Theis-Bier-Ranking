@@ -11,6 +11,10 @@
 <link rel="manifest" href="/Theis-Bier-Ranking/manifest.json"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin>
+<link rel="preconnect" href="https://b.basemaps.cartocdn.com" crossorigin>
+<link rel="preconnect" href="https://c.basemaps.cartocdn.com" crossorigin>
+<link rel="preconnect" href="https://d.basemaps.cartocdn.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Bebas+Neue&family=M+PLUS+Rounded+1c:wght@800&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -360,6 +364,8 @@ body.retro-mode.glitching .hero-title {
   from { opacity: 1; }
   to { opacity: 0; }
 }
+.leaflet-container { background: var(--bg2); }
+.leaflet-tile { will-change: opacity; }
 .beer-popup .leaflet-popup-content-wrapper { background: #1a1a1a; color: #e8e0d0; border: 1px solid #2a2a2a; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
 .beer-popup .leaflet-popup-tip { background: #1a1a1a; }
 .leaflet-control-zoom a { background: var(--bg2) !important; color: var(--text) !important; border-color: var(--border) !important; }
@@ -636,6 +642,7 @@ body.retro-mode.glitching .hero-title {
         <textarea id="edit-notes" placeholder="Geschmack, Eindrücke..." rows="3" maxlength="500"></textarea>
       </div>
     </div>
+    <button class="btn-cancel" style="width:100%;margin-bottom:8px" onclick="rateAgain()">🔄 Neu bewerten</button>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()">Abbrechen</button>
       <button class="btn-confirm" onclick="saveEdit()">Speichern</button>
@@ -1085,7 +1092,7 @@ function setupMap() {
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution: '© OpenStreetMap © CARTO',
     subdomains: 'abcd', maxZoom: 19,
-    keepBuffer: 8,
+    keepBuffer: 2,
     updateWhenZooming: false,
     updateWhenIdle: true,
     tileSize: 256,
@@ -1638,7 +1645,7 @@ function addBeer(){
   finishAddBeer(name, r, date, notes);
 }
 
-function showDupeModal(existing, name, newRating, date, notes) {
+function showDupeModal(existing, name, newRating, date, notes, type) {
   const c = getColor(existing.rating);
   const cNew = getColor(newRating);
   const avg = ((existing.rating + newRating) / 2);
@@ -1678,13 +1685,13 @@ function showDupeModal(existing, name, newRating, date, notes) {
   };
   document.getElementById('dupe-new').onclick = () => {
     modal.classList.remove('open');
-    finishAddBeer(name + ' (2)', newRating, date, notes);
+    finishAddBeer(name + ' (2)', newRating, date, notes, type);
   };
   modal.classList.add('open');
 }
 
-function finishAddBeer(name, r, date, notes) {
-  const newBeer = {id:Date.now(),name,rating:r,date,type:currentType};
+function finishAddBeer(name, r, date, notes, type) {
+  const newBeer = {id:Date.now(),name,rating:r,date,type:type||currentType};
   if(notes) newBeer.notes = notes;
   const locOn = addLocOverride !== null ? addLocOverride : localStorage.getItem('loc_enabled') !== '0';
   if(currentLat !== null && locOn) { newBeer.lat = currentLat; newBeer.lng = currentLng; }
@@ -1710,6 +1717,16 @@ function confirmDelete(){if(pendingDeleteId)deleteBeer(pendingDeleteId,true);clo
 function openEdit(id){const beer=beers.find(b=>b.id===id);if(!beer)return;editingId=id;document.getElementById("edit-name").value=beer.name;document.getElementById("edit-rating").value=beer.rating;document.getElementById("edit-date").value=beer.date;document.getElementById("edit-notes").value=beer.notes||"";currentEditType=beer.type||"flasche";setEditType(currentEditType);document.getElementById("modal").classList.add("open");}
 function closeModal(){document.getElementById("modal").classList.remove("open");editingId=null;}
 function saveEdit(){const name=document.getElementById("edit-name").value.trim();const r=parseFloat(document.getElementById("edit-rating").value);const date=document.getElementById("edit-date").value;const notes=(document.getElementById("edit-notes").value||"").trim().slice(0,500);if(!name||isNaN(r)||r<0||r>10)return;const beer=beers.find(b=>b.id===editingId);if(beer){beer.name=name;beer.rating=r;beer.date=date;beer.type=currentEditType;if(notes)beer.notes=notes;else delete beer.notes;}save();renderList();renderHome();closeModal();}
+function rateAgain(){
+  const beer=beers.find(b=>b.id===editingId);
+  if(!beer)return;
+  const r=parseFloat(document.getElementById("edit-rating").value);
+  const date=document.getElementById("edit-date").value;
+  const notes=(document.getElementById("edit-notes").value||"").trim().slice(0,500);
+  if(isNaN(r)||r<0||r>10)return;
+  closeModal();
+  showDupeModal(beer, beer.name, r, date, notes, beer.type||"flasche");
+}
 function saveFile(){
   // Embed current beers into the HTML before saving
   const embedTag = document.getElementById('embedded-beers-data');
